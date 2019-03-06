@@ -25,4 +25,4 @@ df_merged.drop(['eval_set'], axis=1, inplace=True)
 df_merged['days_since_prior_order'] = df_merged['days_since_prior_order'].fillna(value=df_merged['days_since_prior_order'].mean())
 
 # Export dataset
-df_merged.to_csv('merged_data.csv')
+df_merged.to_csv(folder + 'merged_data.csv')
