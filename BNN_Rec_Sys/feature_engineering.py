@@ -63,15 +63,17 @@ df3 = pd.merge(df2, users, how='left', on='user_id')
 
 prd = prd.reset_index()
 df_final = pd.merge(df3, prd, how ='left', on='product_id')
+print('Merged new features into dataset')
 
 df_final.drop(['Unnamed: 0', 'user_id_x','index_x','level_0','index_y','user_id_y'], axis=1, inplace=True)
 
 # Export dataset for future use
-print('Final dataset writing to csv')
 
-outfile = open(folder+'final_data.csv', 'wb')
+outfile = open(folder+'final_data.csv', 'w')
 df_final.to_csv('final_data.csv',index = False, header = True, sep = ',', encoding = 'utf-8')
 outfile.close()
+
+print('Final dataset writing to csv')
 
 del df,df1,df2,df3,users,prd
 gc.collect()
