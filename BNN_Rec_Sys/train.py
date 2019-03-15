@@ -5,7 +5,7 @@ from sklearn.model_selection import KFold, StratifiedKFold
 
 import create_data, feature_engineering, item2vec_embedding
 
-def read_data:
+def read_data():
 	"""
 	Function to invoke create_data script to read in 
 	Instacart csv files, merge and write dataframe to 
@@ -31,7 +31,7 @@ def add_embeddings(df):
 	Train with basket as context
 	Add embeddings to dataframe and return result
 	"""
-	item2vec_model = item2vec_embeddings.generate_prod_embeddings(df)
+	item2vec_model = item2vec_embedding.generate_prod_embeddings(df)
 	df['prod_embedding'] = item2vec_model.wv(df['product_name'])
 	return df
 
@@ -40,16 +40,14 @@ def main():
 	#read_data()
 
 	# Sample smaller data
-	df = sample_data(fraction = 0.01)
+	df = sample_data(fraction = 0.001)
 
 	#Add features to data
 	df1 = feature_engineering.create_all(df)
 
 	# Adding product embeddings to data
-	df2 = add_embeddings(df1)
-	print(head(df2))
-
-
+	df2 = item2vec_embedding.generate_prod_embeddings(df1)
+	df2.to_csv('/Users/BharathiSrinivasan/Documents/GitHub/Thesis/'+'data_final.csv')
 
 
 

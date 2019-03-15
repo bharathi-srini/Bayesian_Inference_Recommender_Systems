@@ -76,7 +76,7 @@ def create_all(df):
 	prd = prod_features(df).reset_index()
 	df_final = pd.merge(df3, prd, how ='left', on='product_id')
 	
-	df_final.drop(['Unnamed: 0', 'user_id_x','index_x','level_0','index_y','user_id_y'], axis=1, inplace=True)
+	df_final.drop(['Unnamed: 0', 'user_id_x','user_id_y'], axis=1, inplace=True)
 
 	del df,df1,df2,df3,users,prd
 	gc.collect()
