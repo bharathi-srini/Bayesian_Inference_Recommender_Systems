@@ -2,6 +2,7 @@ import pandas as pd
 
 # Change folder to location of Instacart Data!
 #folder = '/Users/BharathiSrinivasan/Documents/Instacart_Data/'
+
 def prepare_data():
 
 	# Reading in csv
