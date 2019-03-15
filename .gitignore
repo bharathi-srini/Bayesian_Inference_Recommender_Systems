@@ -12,3 +12,5 @@ Test Notebooks/.ipynb_checkpoints/generate_df-checkpoint.ipynb
 *.csv
 *.png
 *.pdf
+*.pyc
+*.pyc
