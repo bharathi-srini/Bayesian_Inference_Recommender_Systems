@@ -4,30 +4,6 @@ import gensim
 from matplotlib import pyplot as plt
 from sklearn.decomposition import PCA
 
-folder = '/Users/BharathiSrinivasan/Documents/GitHub/Thesis/'
-df = pd.read_csv(folder + 'merged_data.csv')
-df_small = df.sample(frac = 0.01)
-print('df read')
-
-df_small['product_id'] = df_small['product_id'].astype(str)
-
-#Baskets will be used as sentences
-baskets = df_small.groupby('order_id').apply(lambda order: order['product_id'].tolist())
-
-longest = np.max(baskets.apply(len))
-baskets = baskets.values
-print('sentences created')
-
-#Word2vec on baskets
-model = gensim.models.Word2Vec(baskets, size=100, window=longest, min_count=2, workers=4)
-vocab = list(model.wv.vocab.keys())
-
-print('Embedding created for products!')
-
-#PCA and plotting
-pca = PCA(n_components=2)
-pca.fit(model.wv.syn0)
-
 def get_batch(vocab, model, n_batches=4):
     output = list()
     for i in range(0, n_batches):
@@ -55,15 +31,43 @@ def plot_with_labels(low_dim_embs, labels, filename='tsne.png'):
                      va='bottom')
 #     plt.savefig(filename)
     plt.show('hold')
-    f.savefig('embeddings4.pdf')
+    f.savefig('embeddings.pdf')
 
-products = pd.read_csv("/Users/BharathiSrinivasan/Documents/Instacart_Data/products.csv")
+def generate_prod_embeddings(df_small):
 
-embeds = []
-labels = []
-for item in get_batch(vocab, model, n_batches=4):
-    embeds.append(model[item])
-    labels.append(products.loc[int(item)]['product_name'])
-embeds = np.array(embeds)
-embeds = pca.fit_transform(embeds)
-plot_with_labels(embeds, labels)
+	df_small['product_id'] = df_small['product_id'].astype(str)
+
+	#Baskets will be used as sentences
+	baskets = df_small.groupby('order_id').apply(lambda order: order['product_id'].tolist())
+
+	longest = np.max(baskets.apply(len))
+	baskets = baskets.values
+	print('sentences created')
+
+	#Word2vec on baskets
+	model = gensim.models.Word2Vec(baskets, size=100, window=longest, min_count=2, workers=4)
+	vocab = list(model.wv.vocab.keys())
+
+	# Saving model for training later with new words
+	model.save("word2vec.model")
+
+
+	"""
+	PCA and plotting
+
+	pca = PCA(n_components=2)
+	pca.fit(model.wv.syn0)
+	
+	products = pd.read_csv('/Users/BharathiSrinivasan/Documents/Instacart_Data/products.csv')
+
+	embeds = []
+	labels = []
+	for item in get_batch(vocab, model, n_batches=4):
+	    embeds.append(model[item])
+	    labels.append(products.loc[int(item)]['product_name'])
+	embeds = np.array(embeds)
+	embeds = pca.fit_transform(embeds)
+	plot_with_labels(embeds, labels)
+	"""
+	return model
+

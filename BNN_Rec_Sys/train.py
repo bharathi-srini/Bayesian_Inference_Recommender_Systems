@@ -14,15 +14,6 @@ def read_data:
 	create_data.prepare_data()
 
 
-def create_features(df):
-	"""
-	Function to create user, product and interaction features
-	Arg : data frame
-	Writes csv to folder
-	"""
-	feature_engineering.create_all(df)
-
-
 def sample_data(fraction):
 	"""
 	Reads in merged data from drive
@@ -34,6 +25,17 @@ def sample_data(fraction):
 	return df_big.sample(frac = fraction, random_state = 100)
 
 
+def add_embeddings(df):
+	"""
+	Invoke item2vec model from gensim on products
+	Train with basket as context
+	Add embeddings to dataframe and return result
+	"""
+	item2vec_model = item2vec_embeddings.generate_prod_embeddings(df)
+	df['prod_embedding'] = item2vec_model.wv(df['product_name'])
+	return df
+
+
 def main():
 	#read_data()
 
@@ -41,7 +43,12 @@ def main():
 	df = sample_data(fraction = 0.01)
 
 	#Add features to data
-	df1 = create_features(df)
+	df1 = feature_engineering.create_all(df)
+
+	# Adding product embeddings to data
+	df2 = add_embeddings(df1)
+	print(head(df2))
+
 
 
 

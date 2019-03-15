@@ -70,13 +70,12 @@ def create_all(df):
 	df1 = interaction_features(df).reset_index()
 	df2 = pd.merge(df, df1, how='left', on=['user_id', 'product_id'])
 
-	users = users_features(df).reset_index()
+	users = user_features(df).reset_index()
 	df3 = pd.merge(df2, users, how='left', on='user_id')
 
 	prd = prod_features(df).reset_index()
 	df_final = pd.merge(df3, prd, how ='left', on='product_id')
-	print('Merged new features into dataset')
-
+	
 	df_final.drop(['Unnamed: 0', 'user_id_x','index_x','level_0','index_y','user_id_y'], axis=1, inplace=True)
 
 	del df,df1,df2,df3,users,prd
