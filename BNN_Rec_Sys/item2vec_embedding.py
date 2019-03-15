@@ -33,6 +33,11 @@ def plot_with_labels(low_dim_embs, labels, filename='tsne.png'):
     plt.show('hold')
     f.savefig('embeddings.pdf')
 
+
+def find_similar(model, word):
+	return model.wv.most_similar(positive = word, topn = 5)
+
+
 def generate_prod_embeddings(df_small):
 
 	df_small['product_id'] = df_small['product_id'].astype(str)
@@ -45,13 +50,19 @@ def generate_prod_embeddings(df_small):
 	print('sentences created')
 
 	#Word2vec on baskets
-	model = gensim.models.Word2Vec(baskets, size=100, window=longest, min_count=2, workers=4)
+	model = gensim.models.Word2Vec(baskets, size=100, window=10, min_count=2, workers=4)
+	model.train(baskets, total_examples=len(baskets), epochs=10)
 	vocab = list(model.wv.vocab.keys())
 
 	# Saving model for training later with new words
 	model.save("word2vec.model")
 
+	my_dict = dict({})
+	for idx, key in enumerate(model.wv.vocab):
+		my_dict[key] = model.wv[key]
 
+	df_small['prod_embedding'] = df_small['product_id'].map(my_dict)
+	
 	"""
 	PCA and plotting
 
@@ -69,5 +80,5 @@ def generate_prod_embeddings(df_small):
 	embeds = pca.fit_transform(embeds)
 	plot_with_labels(embeds, labels)
 	"""
-	return model
+	return df_small
 
