@@ -16,3 +16,5 @@ Test Notebooks/.ipynb_checkpoints/generate_df-checkpoint.ipynb
 *.pyc
 BNN_Rec_Sys/__pycache__/create_data.cpython-36.pyc
 BNN_Rec_Sys/__pycache__/create_data.cpython-36.pyc
+*.model
+*.pyc
