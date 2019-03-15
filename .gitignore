@@ -1,0 +1,14 @@
+
+.DS_Store
+.ipynb_checkpoints/Create_dataset-checkpoint.ipynb
+.ipynb_checkpoints/Plain_Deep_Model-checkpoint.ipynb
+Test Notebooks/.ipynb_checkpoints/advi_vanillaNN-checkpoint.ipynb
+Test Notebooks/.ipynb_checkpoints/mcDropout_Model-checkpoint.ipynb
+merged_data.csv
+Test Notebooks/.ipynb_checkpoints/create_features-checkpoint.ipynb
+Test Notebooks/create_features.ipynb
+Test Notebooks/.ipynb_checkpoints/edward_model-checkpoint.ipynb
+Test Notebooks/.ipynb_checkpoints/generate_df-checkpoint.ipynb
+*.csv
+*.png
+*.pdf
