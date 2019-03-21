@@ -5,6 +5,7 @@ from sklearn.model_selection import KFold, StratifiedKFold
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler, StandardScaler
 from sklearn.model_selection import train_test_split
 import time
+import matplotlib.pyplot as plt
 
 import create_data, feature_engineering, item2vec_embedding
 
@@ -43,14 +44,21 @@ def main():
 	#read_data()
 
 	# Sample smaller data
-	df = sample_data(fraction = 0.001)
+	df = sample_data(fraction = 0.01)
+	print('Size of sample :' ,df.shape)
 
 	#Add features to data
 	df1 = feature_engineering.create_all(df)
 
+	plt.figure()
+	plt.hist(df1.reordered)
+	plt.savfig('reordered_dist.pdf')
+
+
+
 	# Adding product embeddings to data
 	df2 = item2vec_embedding.generate_prod_embeddings(df1)
-	df2.to_csv('/Users/BharathiSrinivasan/Documents/GitHub/Thesis/'+'data_final.csv')
+	df2.to_csv('/Users/BharathiSrinivasan/Documents/GitHub/Thesis/'+'data_final.csv', index=False)
 
 
 
