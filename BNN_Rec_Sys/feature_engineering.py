@@ -17,7 +17,7 @@ def prod_features(df):
 	del sub1,sub2
 	gc.collect()
 
-	return sub3[['user_id','product_id', 'product_id_orders','reordered_total']]
+	return sub3[['product_id', 'product_id_orders','reordered_total']]
 
 
 def user_features(df):
@@ -50,7 +50,7 @@ def interaction_features(df):
 	"""
 	User-Product Features
 	Input: dataframe
-	Outut: features columns
+	Output: features columns
 	"""
 
 	# Product Reorder Frequency indicates a user's preference for a particular product
@@ -61,6 +61,22 @@ def interaction_features(df):
 
 	return df1
 
+def correlation_check(df, threshold =0.8):
+	"""
+	Check correlation between created features
+	Removes columns with Pearson correlation > 0.8
+	"""
+	col_corr = []
+	corr_matrix = df.corr()
+	for i in range(len(corr_matrix.columns)):
+		for j in range(i):
+			if (corr_matrix.iloc[i,j]>threshold) and (corr_matrix.columns[j] not in col_corr):
+				colname = corr_matrix.columns[i]
+				col_corr.append(colname)
+				if colname in df.columns:
+					del df[colname]
+	print(*col_corr,sep=" , ")
+	return df
 
 def create_all(df):
 	"""
@@ -76,12 +92,12 @@ def create_all(df):
 	prd = prod_features(df).reset_index()
 	df_final = pd.merge(df3, prd, how ='left', on='product_id')
 	
-	df_final.drop(['Unnamed: 0', 'user_id_y'], axis=1, inplace=True)
+	df_final.drop(['Unnamed: 0'], axis=1, inplace=True)
 
 	del df,df1,df2,df3,users,prd
 	gc.collect()
 
-	return df_final
+	return correlation_check(df_final)
 
 
 
