@@ -27,4 +27,4 @@ def prepare_data():
 	df_merged['days_since_prior_order'] = df_merged['days_since_prior_order'].fillna(value=df_merged['days_since_prior_order'].mean())
 
 	# Export dataset
-	df_merged.to_csv(folder + 'merged_data.csv')
+	df_merged.to_csv(folder + 'merged_data.csv', index = False)
