@@ -32,13 +32,13 @@ def user_features(df):
 	users['user_period'] = df.groupby(['user_id'])['days_since_prior_order'].sum()
 
 	# Average time taken by a user before returning for a purchase
-	users['avg_time_to_order'] = df.groupby(['user_id'])['days_since_prior_order'].mean()
+	#users['avg_time_to_order'] = df.groupby(['user_id'])['days_since_prior_order'].mean()
 
 	# Total unique products ordered by a customer
 	users['user_distinct_products'] = df.groupby(['user_id'])['product_id'].nunique()
 	 
 	# Total products ordered by a customer
-	users['total_products'] = df.groupby(['user_id'])['product_id'].size()
+	#users['total_products'] = df.groupby(['user_id'])['product_id'].size()
 
 	# the average basket size of the user
 	users['user_average_basket'] = users['total_products'] / users['user_orders']
@@ -85,17 +85,21 @@ def create_all(df):
 
 	df1 = interaction_features(df).reset_index()
 	df2 = pd.merge(df, df1, how='left', on=['user_id', 'product_id'])
+	print('interaction merged')
 
 	users = user_features(df).reset_index()
 	df3 = pd.merge(df2, users, how='left', on='user_id')
+	print('users merged')
 
 	prd = prod_features(df).reset_index()
 	df_final = pd.merge(df3, prd, how ='left', on='product_id')
+	print('prods merged')
 	
 	df_final.drop(['Unnamed: 0'], axis=1, inplace=True)
 
-	del df,df1,df2,df3,users,prd
-	gc.collect()
+	#del df,df1,df2,df3,users,prd
+	#gc.collect()
+	print('All merging done')
 
 	return correlation_check(df_final)
 
