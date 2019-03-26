@@ -17,6 +17,19 @@ def read_data():
 	"""
 	create_data.prepare_data()
 
+def data_nusers(df, n):
+	"""
+	Sample data by choosing all orders of n users
+	"""
+    unique_users = df.user_id.unique()
+    i = 0
+    df_nusers = pd.DataFrame()  
+    for user in unique_users:
+        df_nusers = df_nusers.append(df[df.user_id == user])
+        i +=1
+        if (i == n):
+            break
+    return pd.DataFrame(df_nusers)
 
 def sample_data(fraction):
 	"""
