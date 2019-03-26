@@ -21,15 +21,15 @@ def data_nusers(df, n):
 	"""
 	Sample data by choosing all orders of n users
 	"""
-    unique_users = df.user_id.unique()
-    i = 0
-    df_nusers = pd.DataFrame()  
-    for user in unique_users:
-        df_nusers = df_nusers.append(df[df.user_id == user])
-        i +=1
-        if (i == n):
-            break
-    return pd.DataFrame(df_nusers)
+	unique_users = df.user_id.unique()
+	i = 0
+	df_nusers = pd.DataFrame()  
+	for user in unique_users:
+		df_nusers = df_nusers.append(df[df.user_id == user])
+		i +=1
+		if (i == n):
+			break
+	return pd.DataFrame(df_nusers)
 
 def sample_data(fraction):
 	"""
@@ -52,6 +52,14 @@ def add_embeddings(df):
 	df['prod_embedding'] = item2vec_model.wv(df['product_name'])
 	return df
 
+def train_embeddings_model(df):
+	transformed_dat, N_products, N_shoppers = predictNN_embedding.transform_data_for_embedding(df)
+	prior_in, shopper_in, candidates_in, predicted = predictNN_embedding.create_input_for_embed_network(df, transformed_dat, N_products)
+
+	# Fitting model to data
+	predictNN_embedding.create_embedding_network(N_products, N_shoppers, prior_in, shopper_in, candidates_in, predicted )
+
+
 
 def main():
 	#read_data()
@@ -60,20 +68,25 @@ def main():
 	df = sample_data(fraction = 0.001)
 	print('Size of sample :' ,df.shape)
 
+	df_10users = data_nusers(df, 10)
+	print('Size of data with 10 users is: ', df_10users.shape)
+
+	train_embeddings_model(df_10users)
+
 	#Add features to data
-	df1 = feature_engineering.create_all(df)
-	print('Feature engineering done')
+	#df1 = feature_engineering.create_all(df)
+	#print('Feature engineering done')
 
-	plt.figure()
-	plt.hist(df1.reordered)
-	plt.savefig('reordered_dist.pdf')
-
-
+	#plt.figure()
+	#plt.hist(df1.reordered)
+	#plt.savefig('reordered_dist.pdf')
 
 	# Adding product embeddings to data
 	#df2 = item2vec_embedding.generate_prod_embeddings(df1)
-	df1.to_csv('/Users/BharathiSrinivasan/Documents/GitHub/Thesis/'+'data_final.csv', index=False)
-	print('data written to file')
+	#df1.to_csv('/Users/BharathiSrinivasan/Documents/GitHub/Thesis/'+'data_final.csv', index=False)
+	#print('data written to file')
+
+
 
 
 
