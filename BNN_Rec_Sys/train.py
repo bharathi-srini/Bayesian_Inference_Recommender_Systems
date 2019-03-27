@@ -12,13 +12,15 @@ import feature_engineering as features
 import predictNN_embedding as NNembeddings
 import utils
 
+folder = 'C:\\Users\\Pascal\\Documents\\GitHub\\instacart-market-basket-analysis\\'
+
 def read_data():
 	"""
 	Function to invoke create_data script to read in 
 	Instacart csv files, merge and write dataframe to 
 	folder
 	"""
-	initialise.prepare_data()
+	initialise.prepare_data(folder)
 
 def data_nusers(df, n):
 	"""
@@ -40,7 +42,7 @@ def sample_data(fraction):
 	Samples a smaller fraction of data for use
 	Returns smaller dataframe
 	"""
-	folder = '/Users/BharathiSrinivasan/Documents/GitHub/Thesis/'
+	#folder = '/Users/BharathiSrinivasan/Documents/GitHub/Thesis/'
 	df_big = pd.read_csv(folder + 'merged_data.csv')
 	return df_big.sample(frac = fraction, random_state = 100)
 
@@ -60,10 +62,10 @@ def train_embeddings_model(df):
 	df_use = utils.val2idx(df, EMBEDDING_COLUMNS)
 	
 	transformed_dat, N_products, N_shoppers = NNembeddings.transform_data_for_embedding(df_use)
-	prior_in, shopper_in, candidates_in, predicted = NNembeddings.create_input_for_embed_network(df_use, transformed_dat, N_products)
+	product_in , user_in, basket_in, predicted_product = NNembeddings.create_input_for_embed_network(df_use, transformed_dat, N_products)
 
 	# Fitting model to data
-	NNembeddings.create_embedding_network(N_products, N_shoppers, prior_in, shopper_in, candidates_in, predicted )
+	NNembeddings.create_embedding_network(N_products, N_shoppers, product_in , user_in, basket_in, predicted_product )
 
 
 
@@ -71,7 +73,7 @@ def main():
 	#read_data()
 
 	# Sample smaller data
-	df = sample_data(fraction = 0.001)
+	df = sample_data(fraction = 0.01)
 	print('Size of sample :' ,df.shape)
 
 	df_10users = data_nusers(df, 10)
