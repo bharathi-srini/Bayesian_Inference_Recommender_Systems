@@ -7,7 +7,10 @@ from sklearn.model_selection import train_test_split
 import time
 import matplotlib.pyplot as plt
 
-import create_data, feature_engineering, item2vec_embedding, predictNN_embedding
+import create_data as initialise
+import feature_engineering as features
+import predictNN_embedding as NNembeddings
+import utils
 
 def read_data():
 	"""
@@ -15,7 +18,7 @@ def read_data():
 	Instacart csv files, merge and write dataframe to 
 	folder
 	"""
-	create_data.prepare_data()
+	initialise.prepare_data()
 
 def data_nusers(df, n):
 	"""
@@ -53,11 +56,14 @@ def add_embeddings(df):
 	return df
 
 def train_embeddings_model(df):
-	transformed_dat, N_products, N_shoppers = predictNN_embedding.transform_data_for_embedding(df)
-	prior_in, shopper_in, candidates_in, predicted = predictNN_embedding.create_input_for_embed_network(df, transformed_dat, N_products)
+	EMBEDDING_COLUMNS = ["user_id", "product_id"]
+	df_use = utils.val2idx(df, EMBEDDING_COLUMNS)
+	
+	transformed_dat, N_products, N_shoppers = NNembeddings.transform_data_for_embedding(df_use)
+	prior_in, shopper_in, candidates_in, predicted = NNembeddings.create_input_for_embed_network(df_use, transformed_dat, N_products)
 
 	# Fitting model to data
-	predictNN_embedding.create_embedding_network(N_products, N_shoppers, prior_in, shopper_in, candidates_in, predicted )
+	NNembeddings.create_embedding_network(N_products, N_shoppers, prior_in, shopper_in, candidates_in, predicted )
 
 
 
