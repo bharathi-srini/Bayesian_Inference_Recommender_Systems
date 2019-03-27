@@ -33,11 +33,11 @@ def create_basket(order):
 
 def transform_data_for_embedding(df):
     first = df.groupby(['order_id']).apply(first_prod)
-    next_prod = df.groupby(['order_id']).apply(lambda x:next_prod(x))
+    next_product = df.groupby(['order_id']).apply(lambda x:next_prod(x))
     basket =df.groupby(['order_id']).apply(lambda x: create_basket(x))
     
     transform_df = pd.DataFrame(first, columns = ['first_prod'])
-    transform_df['next_prod']= pd.DataFrame(next_prod)
+    transform_df['next_product']= pd.DataFrame(next_product)
     transform_df['basket']= pd.DataFrame(basket)
 
     # Number of product IDs available
@@ -66,8 +66,8 @@ def create_input_for_embed_network(df, transform_df, N_products):
                 basket_df.loc[i,'col_'+val] = 1
     basket_df.fillna(0, inplace=True)
 
-    train_df['next_prod'] = train_df['next_prod'].astype('category', categories = df_use.product_id.unique())
-    y_df = pd.get_dummies(train_df, columns = ['next_prod'])
+    train_df['next_product'] = train_df['next_product'].astype('category', categories = df_use.product_id.unique())
+    y_df = pd.get_dummies(train_df, columns = ['next_product'])
     y_df.drop(['user_id','order_id','first_prod','basket'], axis=1, inplace=True)
     
     train_df.drop(['order_id','next_prod','basket'], axis=1, inplace=True)
@@ -116,6 +116,15 @@ def create_embedding_network(N_products, N_shoppers, prior_in, shopper_in, candi
             optimizer='adam',
             metrics=['accuracy'])
 
-    mdl.fit([prior_in, shopper_in, candidates_in], predicted,  batch_size=128, epochs=3, verbose=1)
+    mdl.fit([prior_in, shopper_in, candidates_in], predicted,  batch_size=128, epochs=3, verbose=1)# serialize model to JSON
+    
+    model_json = mdl.to_json()
+    with open("NN_embed_model.json", "w") as json_file:
+        json_file.write(model_json)
+    # serialize weights to HDF5
+    model.save_weights("NN_embed_model.h5")
+    print("Saved model to disk")
+
+
 
 

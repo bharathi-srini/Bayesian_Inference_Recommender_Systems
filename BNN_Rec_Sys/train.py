@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 import time
 import matplotlib.pyplot as plt
 
-import create_data, feature_engineering, item2vec_embedding
+import create_data, feature_engineering, item2vec_embedding, predictNN_embedding
 
 def read_data():
 	"""
