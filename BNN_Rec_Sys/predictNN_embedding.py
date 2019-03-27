@@ -37,8 +37,11 @@ def transform_data_for_embedding(df):
     basket =df.groupby(['order_id']).apply(lambda x: create_basket(x))
     
     transform_df = pd.DataFrame(first, columns = ['first_prod'])
-    transform_df['next_product']= pd.DataFrame(next_product)
-    transform_df['basket']= pd.DataFrame(basket)
+    transform_df['next_product']= next_product.values
+    transform_df['basket']= basket.tolist()
+    transform_df.reset_index(inplace=True)
+    print('first transformed data')
+    print(transform_df.head())
 
     # Number of product IDs available
     N_products = df['product_id'].nunique()
@@ -49,7 +52,8 @@ def transform_data_for_embedding(df):
 def create_input_for_embed_network(df, transform_df, N_products):
 
     # Creating df with order_id, user_id, first prod, next prod, basket 
-    transform_df.reset_index(inplace=True)
+ 
+    print('next function', transform_df.head())
     x = df.drop_duplicates(subset=['order_id','user_id'])
     train_df = pd.merge(transform_df, x[['order_id','user_id']], how='left', on='order_id' )
     train_df.dropna(inplace=True)
@@ -66,11 +70,11 @@ def create_input_for_embed_network(df, transform_df, N_products):
                 basket_df.loc[i,'col_'+val] = 1
     basket_df.fillna(0, inplace=True)
 
-    train_df['next_product'] = train_df['next_product'].astype('category', categories = df_use.product_id.unique())
+    train_df['next_product'] = train_df['next_product'].astype('category', categories = df.product_id.unique())
     y_df = pd.get_dummies(train_df, columns = ['next_product'])
     y_df.drop(['user_id','order_id','first_prod','basket'], axis=1, inplace=True)
     
-    train_df.drop(['order_id','next_prod','basket'], axis=1, inplace=True)
+    train_df.drop(['order_id','next_product','basket'], axis=1, inplace=True)
 
     return train_df['first_prod'], train_df['user_id'], basket_df, y_df
 
