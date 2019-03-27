@@ -18,5 +18,4 @@ BNN_Rec_Sys/__pycache__/create_data.cpython-36.pyc
 BNN_Rec_Sys/__pycache__/create_data.cpython-36.pyc
 *.model
 *.pyc
-*.ipynb
-Test Notebooks/user_prod_embed.py
+
