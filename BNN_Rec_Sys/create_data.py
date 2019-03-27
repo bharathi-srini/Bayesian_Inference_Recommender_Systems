@@ -3,14 +3,14 @@ import pandas as pd
 # Change folder to location of Instacart Data!
 #folder = '/Users/BharathiSrinivasan/Documents/Instacart_Data/'
 
-def prepare_data():
+def prepare_data(folder):
 
 	# Reading in csv
-	prior = pd.read_csv("order_products__prior.csv")
-	train = pd.read_csv("order_products__train.csv")
-	orders = pd.read_csv("orders.csv")
-	products = pd.read_csv("products.csv")
-	dept = pd.read_csv("departments.csv")
+	prior = pd.read_csv(folder+"order_products__prior.csv")
+	train = pd.read_csv(folder+"order_products__train.csv")
+	orders = pd.read_csv(folder+"orders.csv")
+	products = pd.read_csv(folder+"products.csv")
+	dept = pd.read_csv(folder+"departments.csv")
 
 	# We will create a merged dataset from which we can split data into test
 	# and train datasets of different sizes
