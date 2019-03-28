@@ -79,11 +79,11 @@ def main():
 	df_10users = data_nusers(df, 10)
 	print('Size of data with 10 users is: ', df_10users.shape)
 
-	train_embeddings_model(df_10users)
+	#train_embeddings_model(df_10users)
 
-	#Add features to data
-	#df1 = feature_engineering.create_all(df)
-	#print('Feature engineering done')
+	Add features to data
+	df1 = feature_engineering.create_all(df_10users)
+	print('Feature engineering done')
 
 	#plt.figure()
 	#plt.hist(df1.reordered)
