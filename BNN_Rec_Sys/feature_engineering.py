@@ -41,7 +41,7 @@ def user_features(df):
 	#users['total_products'] = df.groupby(['user_id'])['product_id'].size()
 
 	# the average basket size of the user
-	users['user_average_basket'] = users['total_products'] / users['user_orders']
+	#users['user_average_basket'] = users['total_products'] / users['user_orders']
 
 	return users
 
@@ -95,7 +95,7 @@ def create_all(df):
 	df_final = pd.merge(df3, prd, how ='left', on='product_id')
 	print('prods merged')
 	
-	df_final.drop(['Unnamed: 0'], axis=1, inplace=True)
+	#df_final.drop(['Unnamed: 0'], axis=1, inplace=True)
 
 	#del df,df1,df2,df3,users,prd
 	#gc.collect()
