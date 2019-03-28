@@ -54,7 +54,7 @@ def interaction_features(df):
 	"""
 
 	# Product Reorder Frequency indicates a user's preference for a particular product
-	df['prd_reorder_freq'] = df[df['reordered']==1].groupby(['user_id', 'product_id']).cumcount()+1
+	#df['prd_reorder_freq'] = df[df['reordered']==1].groupby(['user_id', 'product_id']).cumcount()+1
 
 	# Average position of the product in a user's cart
 	df1 = df.groupby(['user_id', 'product_id'])['add_to_cart_order'].mean().to_frame('average_cart_position')
