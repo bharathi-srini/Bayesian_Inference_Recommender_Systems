@@ -75,15 +75,19 @@ def main():
 	# Sample smaller data
 	df = sample_data(fraction = 0.01)
 	print('Size of sample :' ,df.shape)
+	print('Unique users: ' ,df.user_id.nunique())
+	print('Unique products: ' ,df.product_id.nunique())
+	print('Unique orders: ' ,df.order_id.nunique())
 
 	df_10users = data_nusers(df, 10)
 	print('Size of data with 10 users is: ', df_10users.shape)
 
 	#train_embeddings_model(df_10users)
 
-	Add features to data
-	df1 = feature_engineering.create_all(df_10users)
+	#Add features to data
+	df1 = features.create_all(df_10users)
 	print('Feature engineering done')
+	df1.to_csv(folder + 'engineered_data_10.csv', index = False)
 
 	#plt.figure()
 	#plt.hist(df1.reordered)
