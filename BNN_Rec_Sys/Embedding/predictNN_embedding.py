@@ -1,3 +1,4 @@
+import keras
 from keras.models import Model
 from keras.layers.core import Dense, Reshape, Lambda
 from keras.layers import Input, Embedding, merge, Multiply, Concatenate
