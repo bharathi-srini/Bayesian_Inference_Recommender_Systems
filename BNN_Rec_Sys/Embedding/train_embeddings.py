@@ -1,11 +1,8 @@
 import pandas as pd
-import numpy as np
-
 import sys
 sys.path.append('../')
 
 from utils.utils import val2idx
-
 import predictNN_embedding as embed
 
 
@@ -25,11 +22,11 @@ def train_embeddings_model(df):
 	EMBEDDING_COLUMNS = ["user_id", "product_id"]
 	df_use = val2idx(df, EMBEDDING_COLUMNS)
 	
-	transformed_dat, basket_in, N_products, N_shoppers = embed.transform_data_for_embedding(df_use)
-	product_in , user_in, predicted_product = embed.create_input_for_embed_network(df_use, transformed_dat, N_products)
+	transformed_dat, basket, N_products, N_shoppers = embed.transform_data_for_embedding(df_use)
+	product_in , user_in, basket_in, predicted_product = embed.create_input_for_embed_network(df_deep, df1, basket, N_products)
 
 	# Fitting model to data
-	embed.create_embedding_network(N_products, N_shoppers, product_in , user_in, basket_in, predicted_product )
+	embed.create_embedding_network(N_products, N_shoppers, product_in, user_in, basket_in, predicted_product )
 
 def data_nusers(df, n):
 	"""
@@ -46,12 +43,12 @@ def data_nusers(df, n):
 	return pd.DataFrame(df_nusers)
 
 def main():
-	df_big = pd.read_csv(folder + 'merged_data.csv')
-	df_use = data_nusers(df_big, 1000)
-	print('Size of data with 1000 users is: ', df_use.shape)
-	df_use.to_csv(folder+'data1000.csv', index=False)
+	df = pd.read_csv(folder + 'data1000.csv')
+	#df_use = data_nusers(df_big, 1000)
+	#print('Size of data with 1000 users is: ', df_use.shape)
+	#df_use.to_csv(folder+'data1000.csv', index=False)
 
-	train_embeddings_model(df_use)
+	train_embeddings_model(df)
 
 
 if __name__ == '__main__':

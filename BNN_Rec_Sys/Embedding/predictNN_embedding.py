@@ -36,20 +36,22 @@ def transform_data_for_embedding(df):
 
     return transform_df, basket, N_products, N_shoppers
 
-def create_input_for_embed_network(df, transform_df, N_products):
+def create_input_for_embed_network(df, transform_df, basket, N_products):
 
     # Creating df with order_id, user_id, first prod, next prod, basket 
     x = df.drop_duplicates(subset=['order_id','user_id'])
     train_df = pd.merge(transform_df, x[['order_id','user_id']], how='left', on='order_id' )
     train_df.dropna(inplace=True)
+    
+    basket.reset_index(inplace=True)
+    basket_df = pd.merge(train_df[['order_id']], basket, how='left', on ='order_id')
+    basket_df.drop(['order_id'], axis=1, inplace=True)
 
     train_df['next_product'] = train_df['next_product'].astype('category', categories = df.product_id.unique())
     y_df = pd.get_dummies(train_df, columns = ['next_product'])
     y_df.drop(['user_id','order_id','first_prod'], axis=1, inplace=True)
-    
-    train_df.drop(['order_id','next_product'], axis=1, inplace=True)
 
-    return train_df['first_prod'], train_df['user_id'], y_df
+    return train_df['first_prod'], train_df['user_id'], basket_df, y_df
 
 def create_embedding_network(N_products, N_shoppers, prior_in, shopper_in, candidates_in, predicted ):
 
