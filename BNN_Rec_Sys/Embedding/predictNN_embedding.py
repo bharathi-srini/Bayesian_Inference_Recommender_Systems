@@ -69,6 +69,7 @@ def create_input_for_embed_network(df, transform_df, N_products):
             if val!=0:
                 basket_df.loc[i,'col_'+val] = 1
     basket_df.fillna(0, inplace=True)
+    basket_in.drop(['col_0'], axis=1, inplace=True)
 
     train_df['next_product'] = train_df['next_product'].astype('category', categories = df.product_id.unique())
     y_df = pd.get_dummies(train_df, columns = ['next_product'])
@@ -126,7 +127,7 @@ def create_embedding_network(N_products, N_shoppers, prior_in, shopper_in, candi
     with open("NN_embed_model.json", "w") as json_file:
         json_file.write(model_json)
     # serialize weights to HDF5
-    model.save_weights("NN_embed_model.h5")
+    mdl.save_weights("NN_embed_model.h5")
     print("Saved model to disk")
 
 

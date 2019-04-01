@@ -15,13 +15,15 @@ import Data.feature_engineering as features
 import Embedding.predictNN_embedding as NNembeddings
 import utils.utils
 
+folder = 'C:\\Users\\Pascal\\Documents\\GitHub\\instacart-market-basket-analysis\\'
+
 def read_data():
 	"""
 	Function to invoke create_data script to read in 
 	Instacart csv files, merge and write dataframe to 
 	folder
 	"""
-	initialise.prepare_data()
+	initialise.prepare_data(folder)
 
 def data_nusers(df, n):
 	"""
@@ -43,7 +45,7 @@ def sample_data(fraction):
 	Samples a smaller fraction of data for use
 	Returns smaller dataframe
 	"""
-	folder = '/Users/BharathiSrinivasan/Documents/GitHub/Thesis/'
+	#folder = '/Users/BharathiSrinivasan/Documents/GitHub/Thesis/'
 	df_big = pd.read_csv(folder + 'merged_data.csv')
 	return df_big.sample(frac = fraction, random_state = 100)
 
@@ -63,10 +65,10 @@ def train_embeddings_model(df):
 	df_use = utils.val2idx(df, EMBEDDING_COLUMNS)
 	
 	transformed_dat, N_products, N_shoppers = NNembeddings.transform_data_for_embedding(df_use)
-	prior_in, shopper_in, candidates_in, predicted = NNembeddings.create_input_for_embed_network(df_use, transformed_dat, N_products)
+	product_in , user_in, basket_in, predicted_product = NNembeddings.create_input_for_embed_network(df_use, transformed_dat, N_products)
 
 	# Fitting model to data
-	NNembeddings.create_embedding_network(N_products, N_shoppers, prior_in, shopper_in, candidates_in, predicted )
+	NNembeddings.create_embedding_network(N_products, N_shoppers, product_in , user_in, basket_in, predicted_product )
 
 
 
@@ -74,17 +76,21 @@ def main():
 	#read_data()
 
 	# Sample smaller data
-	df = sample_data(fraction = 0.001)
+	df = sample_data(fraction = 0.01)
 	print('Size of sample :' ,df.shape)
+	print('Unique users: ' ,df.user_id.nunique())
+	print('Unique products: ' ,df.product_id.nunique())
+	print('Unique orders: ' ,df.order_id.nunique())
 
 	df_10users = data_nusers(df, 1)
 	print('Size of data with 10 users is: ', df_10users.shape)
 
-	train_embeddings_model(df_10users)
+	#train_embeddings_model(df_10users)
 
 	#Add features to data
-	#df1 = feature_engineering.create_all(df)
-	#print('Feature engineering done')
+	df1 = features.create_all(df_10users)
+	print('Feature engineering done')
+	df1.to_csv(folder + 'engineered_data_10.csv', index = False)
 
 	#plt.figure()
 	#plt.hist(df1.reordered)
