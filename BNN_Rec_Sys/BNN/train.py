@@ -7,10 +7,13 @@ from sklearn.model_selection import train_test_split
 import time
 import matplotlib.pyplot as plt
 
-import create_data as initialise
-import feature_engineering as features
-import predictNN_embedding as NNembeddings
-import utils
+import sys
+sys.path.append('../')
+
+import Data.create_data as initialise
+import Data.feature_engineering as features
+import Embedding.predictNN_embedding as NNembeddings
+import utils.utils
 
 folder = 'C:\\Users\\Pascal\\Documents\\GitHub\\instacart-market-basket-analysis\\'
 
@@ -79,7 +82,7 @@ def main():
 	print('Unique products: ' ,df.product_id.nunique())
 	print('Unique orders: ' ,df.order_id.nunique())
 
-	df_10users = data_nusers(df, 10)
+	df_10users = data_nusers(df, 1)
 	print('Size of data with 10 users is: ', df_10users.shape)
 
 	#train_embeddings_model(df_10users)
