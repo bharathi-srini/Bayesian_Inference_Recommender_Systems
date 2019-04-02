@@ -101,7 +101,7 @@ def create_all(df):
 	#gc.collect()
 	print('All merging done')
 
-	return correlation_check(df_final)
+	return df_final
 
 
 
