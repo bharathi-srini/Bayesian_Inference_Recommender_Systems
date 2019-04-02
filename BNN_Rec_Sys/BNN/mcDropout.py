@@ -81,7 +81,7 @@ def test_train_split_data(df):
 
 	return products_in, users_in, X_train, y_train, products_test, users_test, X_test, y_test
 
-def create_MCdropout_model():
+def create_MCdropout_model(products_in, users_in, X_train, y_train, products_test, users_test, X_test, y_test):
 	# Integer IDs representing 1-hot encodings
 	prior_in = Input(shape=(1,))
 	shopper_in = Input(shape=(1,))
@@ -114,5 +114,12 @@ def create_MCdropout_model():
 
 	model = Model(inputs=[prior_in, shopper_in, input_tensor], outputs=softmax_output)
 
-	return model
+	model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy'])
+
+	out = model.fit([products_in , users_in, X_train], y_train,batch_size=params['batch_size'],
+                    epochs=params['epochs'],
+                    verbose=0,
+                    validation_data=[[products_test , users_test, X_test], y_test])
+
+	return model, out
 
