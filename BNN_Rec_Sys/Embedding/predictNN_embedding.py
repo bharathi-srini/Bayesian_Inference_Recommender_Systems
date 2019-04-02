@@ -9,7 +9,7 @@ from sklearn.model_selection import train_test_split
 from keras import preprocessing
 from keras.regularizers import l2
 import random
-from keras.layers.advanced_activations import LeakyReLU
+import talos
 
 
 def first_prod(order):

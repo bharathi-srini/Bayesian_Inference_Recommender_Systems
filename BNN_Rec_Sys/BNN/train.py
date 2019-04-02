@@ -54,21 +54,17 @@ def main():
 	#read_data()
 
 	# Sample smaller data
-	df = sample_data(fraction = 0.01)
-	print('Size of sample :' ,df.shape)
-	print('Unique users: ' ,df.user_id.nunique())
-	print('Unique products: ' ,df.product_id.nunique())
-	print('Unique orders: ' ,df.order_id.nunique())
+	#df = sample_data(fraction = 0.01)
 
-	df_10users = data_nusers(df, 1)
-	print('Size of data with 10 users is: ', df_10users.shape)
+	df_1000users = pd.read_csv(folder+'data1000.csv')
+	#print('Size of data with 10 users is: ', df_10users.shape)
 
 	#train_embeddings_model(df_10users)
 
 	#Add features to data
-	df1 = features.create_all(df_10users)
+	df1 = features.create_all(df_1000users)
 	print('Feature engineering done')
-	df1.to_csv(folder + 'engineered_data_10.csv', index = False)
+	df1.to_csv(folder + 'engineered_data_10000.csv', index = False)
 
 	#plt.figure()
 	#plt.hist(df1.reordered)
