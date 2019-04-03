@@ -77,6 +77,7 @@ def main():
 	#read_data()
 
 	# Sample smaller data
+	'''
 	df = sample_data(fraction = 1)
 	print('Size of sample :' ,df.shape)
 	print('Unique users: ' ,df.user_id.nunique())
@@ -87,11 +88,23 @@ def main():
 	print('Size of data with 1000 users is: ', df_100users.shape)
 
 	#train_embeddings_model(df_10users)
-
+	'''
+	out_sample_users = pd.read_csv(folder+'out_sample_users.csv')
+	out_sample_prd = pd.read_csv(folder + 'out_sample_prd.csv')
+	out_sample_both = pd.read_csv(folder+'out_sample_both.csv')
 	#Add features to data
-	df1 = features.create_all(df_100users)
-	print('Feature engineering done')
-	df1.to_csv(folder + 'engineered_data_100.csv', index = False)
+	df1 = features.create_all(out_sample_users)
+	print('Feature engineering done - users')
+	df1.to_csv(folder + 'engineered_data_users_out.csv', index = False)
+
+	df2 = features.create_all(out_sample_prd)
+	print('Feature engineering done - prd')
+	df2.to_csv(folder + 'engineered_data_out_prd.csv', index = False)
+
+
+	df3 = features.create_all(out_sample_both.sample(frac=0.01))
+	print('Feature engineering done - both')
+	df3.to_csv(folder + 'engineered_data_out_both.csv', index = False)
 
 	#df1 = features.create_all(df_1000users)
 	#print('Feature engineering done')
