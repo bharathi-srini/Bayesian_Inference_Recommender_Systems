@@ -95,13 +95,9 @@ def create_all(df):
 	df_final = pd.merge(df3, prd, how ='left', on='product_id')
 	print('prods merged')
 	
-	#df_final.drop(['Unnamed: 0'], axis=1, inplace=True)
-
-	#del df,df1,df2,df3,users,prd
-	#gc.collect()
 	print('All merging done')
 
-	return correlation_check(df_final)
+	return df_final
 
 
 

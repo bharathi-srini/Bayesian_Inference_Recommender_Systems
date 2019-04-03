@@ -29,4 +29,10 @@ Test Notebooks/.ipynb_checkpoints/bpr-test-checkpoint.ipynb
 *.h5
 *.json
 >>>>>>> 59b6502c1ca6f25a9248693fd18a7de24b631211
+<<<<<<< HEAD
 Test Notebooks/.ipynb_checkpoints/test_basket-checkpoint.ipynb
+=======
+Test Notebooks/.ipynb_checkpoints/embedding_new-checkpoint.ipynb
+Test Notebooks/.ipynb_checkpoints/basket_context_embeddings-checkpoint.ipynb
+Test Notebooks/.ipynb_checkpoints/plot_embeddings-checkpoint.ipynb
+>>>>>>> f96c92aef0eb5b91cc9b41a43e38502ced595b22

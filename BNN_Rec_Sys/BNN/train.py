@@ -50,6 +50,7 @@ def sample_data(fraction):
 	return df_big.sample(frac = fraction, random_state = 100)
 
 
+<<<<<<< HEAD
 def add_embeddings(df):
 	"""
 	Invoke item2vec model from gensim on products
@@ -72,10 +73,13 @@ def train_embeddings_model(df):
 
 
 
+=======
+>>>>>>> f96c92aef0eb5b91cc9b41a43e38502ced595b22
 def main():
 	#read_data()
 
 	# Sample smaller data
+<<<<<<< HEAD
 	df = sample_data(fraction = 1)
 	print('Size of sample :' ,df.shape)
 	print('Unique users: ' ,df.user_id.nunique())
@@ -84,13 +88,25 @@ def main():
 
 	df_1000users = data_nusers(df, 1000)
 	print('Size of data with 1000 users is: ', df_1000users.shape)
+=======
+	#df = sample_data(fraction = 0.01)
+
+	df_1000users = pd.read_csv(folder+'data1000.csv')
+	#print('Size of data with 10 users is: ', df_10users.shape)
+>>>>>>> f96c92aef0eb5b91cc9b41a43e38502ced595b22
 
 	#train_embeddings_model(df_10users)
 
 	#Add features to data
+<<<<<<< HEAD
 	#df1 = features.create_all(df_1000users)
 	#print('Feature engineering done')
 	df_1000users.to_csv(folder + 'data_1000.csv', index = False)
+=======
+	df1 = features.create_all(df_1000users)
+	print('Feature engineering done')
+	df1.to_csv(folder + 'engineered_data_10000.csv', index = False)
+>>>>>>> f96c92aef0eb5b91cc9b41a43e38502ced595b22
 
 	#plt.figure()
 	#plt.hist(df1.reordered)
