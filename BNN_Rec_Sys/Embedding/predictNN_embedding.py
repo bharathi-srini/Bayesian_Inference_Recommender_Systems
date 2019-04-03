@@ -9,15 +9,13 @@ from sklearn.model_selection import train_test_split
 from keras import preprocessing
 from keras.regularizers import l2
 import random
-<<<<<<< HEAD
+
 
 import sys
 sys.path.append('../')
 
 #from BNN.train import sample_data
-=======
 import talos
->>>>>>> f96c92aef0eb5b91cc9b41a43e38502ced595b22
 
 
 def first_prod(order):
@@ -32,16 +30,6 @@ def next_prod(order):
         if row['add_to_cart_order']==2:
             return row['product_id']
 
-<<<<<<< HEAD
-def create_basket(order):
-    #order['product_id']= order['product_id'].astype(str)
-    
-    basket = []
-    for _,row in order.iterrows():
-        if row['add_to_cart_order']!=1:
-            basket.append(row['product_id'])
-    #basket = random.shuffle(basket)
-    return basket_df
 
 def transform_data_for_embedding(df):
 
@@ -53,26 +41,23 @@ def transform_data_for_embedding(df):
     next_product = df.groupby(['order_id']).apply(lambda x:next_prod(x))
     basket =df.groupby(['order_id']).apply(lambda x: create_basket(x))
     
-=======
 
 def transform_data_for_embedding(df):
     first = df.groupby(['order_id']).apply(lambda x: first_prod(x))
     next_product = df.groupby(['order_id']).apply(lambda x: next_prod(x))
     basket = df.groupby(['order_id', 'product_id']).size().unstack(fill_value=0)
->>>>>>> f96c92aef0eb5b91cc9b41a43e38502ced595b22
     transform_df = pd.DataFrame(first, columns = ['first_prod'])
     transform_df['next_product'] = next_product.values
     transform_df.reset_index(inplace=True)
 
-<<<<<<< HEAD
     return transform_df,basket, N_products, N_shoppers
-=======
+
     # Number of product IDs available
     N_products = df['product_id'].nunique()
     N_shoppers = df['user_id'].nunique()
 
     return transform_df, basket, N_products, N_shoppers
->>>>>>> f96c92aef0eb5b91cc9b41a43e38502ced595b22
+
 
 def create_input_for_embed_network(df, transform_df, basket, N_products):
 
@@ -80,7 +65,6 @@ def create_input_for_embed_network(df, transform_df, basket, N_products):
     x = df.drop_duplicates(subset=['order_id','user_id'])
     train_df = pd.merge(transform_df, x[['order_id','user_id']], how='left', on='order_id' )
     train_df.dropna(inplace=True)
-<<<<<<< HEAD
 
 
     # Creating basket as categorical matrix for deep neural network output
@@ -95,12 +79,10 @@ def create_input_for_embed_network(df, transform_df, basket, N_products):
                 basket_df.loc[i,'col_'+val] = 1
     basket_df.fillna(0, inplace=True)
     basket_in.drop(['col_0'], axis=1, inplace=True)
-=======
     
     basket.reset_index(inplace=True)
     basket_df = pd.merge(train_df[['order_id']], basket, how='left', on ='order_id')
     basket_df.drop(['order_id'], axis=1, inplace=True)
->>>>>>> f96c92aef0eb5b91cc9b41a43e38502ced595b22
 
 
     train_df['next_product'] = train_df['next_product'].astype('category', categories = df.product_id.unique())
@@ -148,9 +130,8 @@ def create_embedding_network(N_products, N_shoppers, prior_in, shopper_in, candi
             output=predicted)
     mdl.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-<<<<<<< HEAD
     mdl.fit([prior_in, shopper_in, candidates_in], predicted,  batch_size=128, epochs=3, verbose=1)
-=======
+
     history_callback = mdl.fit([prior_in, shopper_in, candidates_in], predicted,  batch_size=128, epochs=3, verbose=1)
     loss_history = history_callback.history["loss"]
     acc_history = history_callback.history["accuracy"]
@@ -158,7 +139,6 @@ def create_embedding_network(N_products, N_shoppers, prior_in, shopper_in, candi
     acc_history_array = np.array(acc_history)
     np.savetxt(folder+"loss_history.txt", loss_history_array, delimiter=",")
     np.savetxt(folder+"acc_history.txt", acc_history_array, delimiter=",")
->>>>>>> f96c92aef0eb5b91cc9b41a43e38502ced595b22
 
     # serialize model to JSON
     model_json = mdl.to_json()
