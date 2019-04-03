@@ -8,7 +8,11 @@ from sklearn.model_selection import train_test_split
 from keras import preprocessing
 from keras.regularizers import l2
 import random
-from keras.layers.advanced_activations import LeakyReLU
+
+import sys
+sys.path.append('../')
+
+#from BNN.train import sample_data
 
 
 def first_prod(order):
@@ -22,16 +26,21 @@ def next_prod(order):
             return row['product_id']
 
 def create_basket(order):
-    order['product_id']= order['product_id'].astype(str)
+    #order['product_id']= order['product_id'].astype(str)
     
     basket = []
     for _,row in order.iterrows():
         if row['add_to_cart_order']!=1:
             basket.append(row['product_id'])
     #basket = random.shuffle(basket)
-    return basket
+    return basket_df
 
 def transform_data_for_embedding(df):
+
+    # Number of product IDs available
+    N_products = df['product_id'].nunique()
+    N_shoppers = df['user_id'].nunique()
+
     first = df.groupby(['order_id']).apply(first_prod)
     next_product = df.groupby(['order_id']).apply(lambda x:next_prod(x))
     basket =df.groupby(['order_id']).apply(lambda x: create_basket(x))
@@ -43,11 +52,7 @@ def transform_data_for_embedding(df):
     print('first transformed data')
     print(transform_df.head())
 
-    # Number of product IDs available
-    N_products = df['product_id'].nunique()
-    N_shoppers = df['user_id'].nunique()
-
-    return transform_df, N_products, N_shoppers
+    return transform_df,basket, N_products, N_shoppers
 
 def create_input_for_embed_network(df, transform_df, N_products):
 
@@ -57,6 +62,7 @@ def create_input_for_embed_network(df, transform_df, N_products):
     x = df.drop_duplicates(subset=['order_id','user_id'])
     train_df = pd.merge(transform_df, x[['order_id','user_id']], how='left', on='order_id' )
     train_df.dropna(inplace=True)
+
 
     # Creating basket as categorical matrix for deep neural network output
     names = []
@@ -70,6 +76,7 @@ def create_input_for_embed_network(df, transform_df, N_products):
                 basket_df.loc[i,'col_'+val] = 1
     basket_df.fillna(0, inplace=True)
     basket_in.drop(['col_0'], axis=1, inplace=True)
+
 
     train_df['next_product'] = train_df['next_product'].astype('category', categories = df.product_id.unique())
     y_df = pd.get_dummies(train_df, columns = ['next_product'])
@@ -121,14 +128,19 @@ def create_embedding_network(N_products, N_shoppers, prior_in, shopper_in, candi
             optimizer='adam',
             metrics=['accuracy'])
 
-    mdl.fit([prior_in, shopper_in, candidates_in], predicted,  batch_size=128, epochs=3, verbose=1)# serialize model to JSON
-    
+    mdl.fit([prior_in, shopper_in, candidates_in], predicted,  batch_size=128, epochs=3, verbose=1)
+
+    # serialize model to JSON
     model_json = mdl.to_json()
     with open("NN_embed_model.json", "w") as json_file:
         json_file.write(model_json)
     # serialize weights to HDF5
     mdl.save_weights("NN_embed_model.h5")
     print("Saved model to disk")
+
+def main():
+    df = sample_data(0.01)
+
 
 
 
