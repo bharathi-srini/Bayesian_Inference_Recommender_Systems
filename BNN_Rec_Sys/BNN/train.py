@@ -5,6 +5,9 @@ from sklearn.model_selection import KFold, StratifiedKFold
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler, StandardScaler
 from sklearn.model_selection import train_test_split
 import time
+
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
 import sys
@@ -86,9 +89,9 @@ def main():
 	#train_embeddings_model(df_10users)
 
 	#Add features to data
-	#df1 = features.create_all(df_1000users)
-	#print('Feature engineering done')
-	df_100users.to_csv(folder + 'data_100.csv', index = False)
+	df1 = features.create_all(df_100users)
+	print('Feature engineering done')
+	df1.to_csv(folder + 'engineered_data_100.csv', index = False)
 
 	#df1 = features.create_all(df_1000users)
 	#print('Feature engineering done')
