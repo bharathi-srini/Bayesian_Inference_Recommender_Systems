@@ -18,78 +18,65 @@ sys.path.append('../')
 import talos
 
 
-def first_prod(order):
+def create_sequence(df_deep):
+    """
+    For each order, first prod is product added first
+    next_prod is the subsequent product added to basket
+    Iterates sequentially for all products in the basket
+    """
+    # Creating an order size columns for creating purchase sequences later
+    order_size = pd.DataFrame(df_deep.groupby(['order_id']).size())
+    order_size = order_size.reset_index()
+    order_size.columns = {'order_id','size'}
+
+    df_deep = df_deep.merge(order_size, how='left', on='order_id')
+
+    # For every order, we create a row with product ordered and the next product added to basket
+    orders_list = df_deep.order_id.unique()
     first_prod = []
-    for _,row in order.iterrows():
-        if row['add_to_cart_order']==1:
-            first_prod.append(row['product_id'])
-    return first_prod
+    next_prod = []
+    order_ids = []
 
-def next_prod(order):
-    for _,row in order.iterrows():
-        if row['add_to_cart_order']==2:
-            return row['product_id']
+    for order in orders_list:
+        temp = df_deep[df_deep.order_id == order]
+        for i in range(int(temp.size) - 1):
+            order_ids.append((temp[temp.add_to_cart_order == i].order_id).values)
+            first_prod.append((temp[temp.add_to_cart_order == i].product_id).values)
+            next_prod.append((temp[temp.add_to_cart_order == i+1].product_id).values)
 
+    # Creating dataframe with these sequences
+    sequence_df = pd.DataFrame(columns={'order_id','first_prod','next_prod'} )
+    sequence_df.order_id = order_ids
+    sequence_df.first_prod = first_prod
+    sequence_df.next_prod = next_prod
 
-def transform_data_for_embedding(df):
-
-    # Number of product IDs available
-    N_products = df['product_id'].nunique()
-    N_shoppers = df['user_id'].nunique()
-
-    first = df.groupby(['order_id']).apply(first_prod)
-    next_product = df.groupby(['order_id']).apply(lambda x:next_prod(x))
-    basket =df.groupby(['order_id']).apply(lambda x: create_basket(x))
+    for col in sequence_df.columns:
+        sequence_df[col] = sequence_df[col].apply(pd.Series)
     
+    #first product of basket creates empty row
+    sequence_df = sequence_df.dropna()
 
-def transform_data_for_embedding(df):
-    first = df.groupby(['order_id']).apply(lambda x: first_prod(x))
-    next_product = df.groupby(['order_id']).apply(lambda x: next_prod(x))
-    basket = df.groupby(['order_id', 'product_id']).size().unstack(fill_value=0)
-    transform_df = pd.DataFrame(first, columns = ['first_prod'])
-    transform_df['next_product'] = next_product.values
-    transform_df.reset_index(inplace=True)
+    merged1 = pd.merge(sequence_df, df_deep[['order_id', 'user_id']], how='left', on='order_id')
+    merged1 = merged1.drop_duplicates()
 
-    return transform_df,basket, N_products, N_shoppers
+    basket =df_deep.groupby(['order_id', 'product_id']).size().unstack(fill_value=0)
+    basket = basket.reset_index()
 
-    # Number of product IDs available
-    N_products = df['product_id'].nunique()
-    N_shoppers = df['user_id'].nunique()
+    #Making dataframe sizes equal with a merge
+    merged = pd.merge(sequence_df, basket, how='left', on='order_id')
 
-    return transform_df, basket, N_products, N_shoppers
+    product_in = merged['first_prod']
+    user_in = merged1['user_id']
 
+    basket = merged.drop(['Unnamed: 0', 'order_id','first_prod', 'next_prod'], axis=1)
 
-def create_input_for_embed_network(df, transform_df, basket, N_products):
+    sequence_df['next_prod'] = sequence_df['next_prod'].astype('category', categories = df_deep.product_id.unique())
+    predicted_product = pd.get_dummies(sequence_df, columns = ['next_prod'])
+    predicted_product.drop(['Unnamed: 0','order_id','first_prod'], axis=1, inplace=True)
 
-    # Creating df with order_id, user_id, first prod, next prod, basket 
-    x = df.drop_duplicates(subset=['order_id','user_id'])
-    train_df = pd.merge(transform_df, x[['order_id','user_id']], how='left', on='order_id' )
-    train_df.dropna(inplace=True)
+    return product_in, user_in, basket, predicted_product
 
 
-    # Creating basket as categorical matrix for deep neural network output
-    names = []
-    for col in range(N_products):
-        names.append('col_' + str(col)) 
-
-    basket_df = pd.DataFrame(columns= names)
-    for i,row in train_df.iterrows():
-        for val in row.basket:
-            if val!=0:
-                basket_df.loc[i,'col_'+val] = 1
-    basket_df.fillna(0, inplace=True)
-    basket_in.drop(['col_0'], axis=1, inplace=True)
-    
-    basket.reset_index(inplace=True)
-    basket_df = pd.merge(train_df[['order_id']], basket, how='left', on ='order_id')
-    basket_df.drop(['order_id'], axis=1, inplace=True)
-
-
-    train_df['next_product'] = train_df['next_product'].astype('category', categories = df.product_id.unique())
-    y_df = pd.get_dummies(train_df, columns = ['next_product'])
-    y_df.drop(['user_id','order_id','first_prod'], axis=1, inplace=True)
-
-    return train_df['first_prod'], train_df['user_id'], basket_df, y_df
 
 def create_embedding_network(N_products, N_shoppers, prior_in, shopper_in, candidates_in, predicted ):
 
@@ -109,13 +96,13 @@ def create_embedding_network(N_products, N_shoppers, prior_in, shopper_in, candi
     combined = keras.layers.concatenate([reshape(prior), reshape(shopper)])
 
     # Hidden layers
-    #hidden_1 = Dense(1024, activation='relu',W_regularizer=l2(0.02))(combined)
-    hidden_2 = Dense(512, activation='relu',W_regularizer=l2(0.02))(combined)
-    hidden_3 = Dense(200, activation='relu')(hidden_2)
-    #hidden_4 = Dense(1, activation='relu')(hidden_3)
+    hidden_1 = Dense(512, activation='relu')(combined)
+    hidden_2 = Dense(256, activation='relu')(hidden_1)
+    hidden_3 = Dense(128, activation='relu')(hidden_2)
+    hidden_4 = Dense(50, activation='linear')(hidden_3)
 
     # Final 'fan-out' into the space of future products
-    final = Dense(N_products, activation='relu')(hidden_3)
+    final = Dense(N_products, activation='linear')(hidden_4)
 
     # Ensure we do not overflow when we exponentiate
     final = Lambda(lambda x: x - K.max(x))(final)
@@ -126,11 +113,9 @@ def create_embedding_network(N_products, N_shoppers, prior_in, shopper_in, candi
     predicted = Lambda(lambda x: x / K.sum(x))(masked)
 
     # Compile with categorical crossentropy and adam
-    mdl = Model(input=[prior_in, shopper_in, candidates_in],
-            output=predicted)
-    mdl.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-
-    mdl.fit([prior_in, shopper_in, candidates_in], predicted,  batch_size=128, epochs=3, verbose=1)
+    mdl = Model(input=[prior_in , shopper_in, candidates_in],output=predicted)
+    mdl.compile(loss='categorical_crossentropy', \
+            optimizer=optimizers.Adam(),metrics=['accuracy'])
 
     history_callback = mdl.fit([prior_in, shopper_in, candidates_in], predicted,  batch_size=128, epochs=3, verbose=1)
     loss_history = history_callback.history["loss"]
@@ -148,8 +133,7 @@ def create_embedding_network(N_products, N_shoppers, prior_in, shopper_in, candi
     mdl.save_weights(folder+"NN_embed_model.h5")
     print("Saved model to disk")
 
-def main():
-    df = sample_data(0.01)
+
 
 
 

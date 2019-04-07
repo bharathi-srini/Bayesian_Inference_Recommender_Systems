@@ -66,8 +66,7 @@ def train_embeddings_model(df):
 	EMBEDDING_COLUMNS = ["user_id", "product_id"]
 	df_use = utils.val2idx(df, EMBEDDING_COLUMNS)
 	
-	transformed_dat, N_products, N_shoppers = embed.transform_data_for_embedding(df_use)
-	product_in , user_in, basket_in, predicted_product = embed.create_input_for_embed_network(df_use, transformed_dat, N_products)
+	product_in , user_in, basket_in, predicted_product = embed.create_sequence(df_use)
 
 	# Fitting model to data
 	embed.create_embedding_network(N_products, N_shoppers, product_in , user_in, basket_in, predicted_product )
