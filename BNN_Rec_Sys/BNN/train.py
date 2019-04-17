@@ -83,10 +83,16 @@ def main():
 	print('Unique products: ' ,df.product_id.nunique())
 	print('Unique orders: ' ,df.order_id.nunique())
 
-	df_100users = data_nusers(df, 100)
-	print('Size of data with 1000 users is: ', df_100users.shape)
 
 	#train_embeddings_model(df_10users)
+	'''
+
+	df = sample_data(fraction=1)
+	df_use = data_nusers(df, 300)
+	print('Size of sample:', df_use.shape)
+	print('users :', df_use.user_id.nunique())
+	print('products: ', df_use.product_id.nunique() )
+
 	'''
 	out_sample_users = pd.read_csv(folder+'out_sample_users.csv')
 	out_sample_prd = pd.read_csv(folder + 'out_sample_prd.csv')
@@ -104,10 +110,11 @@ def main():
 	df3 = features.create_all(out_sample_both.sample(frac=0.01))
 	print('Feature engineering done - both')
 	df3.to_csv(folder + 'engineered_data_out_both.csv', index = False)
+	'''
 
-	#df1 = features.create_all(df_1000users)
-	#print('Feature engineering done')
-	#df1.to_csv(folder + 'engineered_data_10000.csv', index = False)
+	df1 = features.create_all(df_use)
+	print('Feature engineering done')
+	df1.to_csv(folder + 'engineered_data_300.csv', index = False)
 
 	#plt.figure()
 	#plt.hist(df1.reordered)
